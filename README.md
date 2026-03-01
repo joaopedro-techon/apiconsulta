@@ -85,10 +85,29 @@ Crie a tabela no Aurora executando `src/main/resources/schema.sql`.
 
 ```
 GET /api/operacoes-credito/{numeroOperacao}
+GET /api/operacoes-credito/{numeroOperacao}?expand=parcelas
+GET /api/operacoes-credito/{numeroOperacao}?fields=operacao(numeroOperacao,status),parcelas(numeroParcela)&expand=parcelas
 Accept: application/json
 ```
 
-**200 OK** – operação com lista de parcelas:
+**Parâmetros (Criteria API no banco — uma query, JOIN só com expand):**
+
+| Parâmetro | Descrição |
+|-----------|------------|
+| `expand`  | `parcelas` — inclui parcelas na resposta. **Sem expand = só operação** (menos dados, melhor performance). |
+| `fields`  | Projeção: quais campos retornar. Formato estruturado ou com pontos. |
+
+**Formato estruturado (recomendado):** `fields=operacao(numeroOperacao,status),parcelas(numeroParcela,valorPrincipalParcela)`  
+**Com pontos:** `fields=operacao.numeroOperacao,parcelas.numeroParcela`
+
+**Campos:** `operacao`: numeroOperacao, status, dataContratacao, codigoMeioCobranca. `parcelas`: numeroOperacao, numeroParcela, statusParcela, valorPrincipalParcela, valorJuroPrincipalParcela.
+
+Exemplos:
+- Sem parâmetros → só operação (todos os campos)
+- `?expand=parcelas` → operação + parcelas (todos os campos)
+- `?fields=operacao(numeroOperacao,status)&expand=parcelas` → operação (só número e status) + parcelas (todos)
+
+**200 OK** – operação (e parcelas se `expand=parcelas`):
 ```json
 {
   "operacao": {
