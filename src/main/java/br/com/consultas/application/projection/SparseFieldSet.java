@@ -21,11 +21,22 @@ public final class SparseFieldSet {
             "numeroOperacao", "numeroParcela", "statusParcela",
             "valorPrincipalParcela", "valorJuroPrincipalParcela"
     );
+    public static final Set<String> ORIGINACAO_FIELDS = Set.of(
+            "numeroOperacao", "taxaJuros", "canalContratacao"
+    );
+    public static final Set<String> AMORTIZACOES_FIELDS = Set.of(
+            "numeroOperacao", "numeroParcelaAmortizada", "dataRecebimento",
+            "valorPrincipalAmortizado", "valorJurosPrincipalAmortizado", "indicadorValidadeAmortizacao"
+    );
 
     /** Aceita operacao ou operacoes */
     private static final Set<String> RESOURCE_OPERACAO = Set.of("operacao", "operacoes");
     /** Aceita parcela ou parcelas */
     private static final Set<String> RESOURCE_PARCELAS = Set.of("parcela", "parcelas");
+    /** Aceita originacao ou originacoes */
+    private static final Set<String> RESOURCE_ORIGINACAO = Set.of("originacao", "originacoes");
+    /** Aceita amortizacao ou amortizacoes */
+    private static final Set<String> RESOURCE_AMORTIZACOES = Set.of("amortizacao", "amortizacoes");
     private static final Pattern STRUCTURED = Pattern.compile("(\\w+)\\(([^)]*)\\)");
 
     private static boolean isOperacao(String resource) {
@@ -36,12 +47,24 @@ public final class SparseFieldSet {
         return resource != null && RESOURCE_PARCELAS.contains(resource.toLowerCase());
     }
 
+    private static boolean isOriginacao(String resource) {
+        return resource != null && RESOURCE_ORIGINACAO.contains(resource.toLowerCase());
+    }
+
+    private static boolean isAmortizacoes(String resource) {
+        return resource != null && RESOURCE_AMORTIZACOES.contains(resource.toLowerCase());
+    }
+
     private final List<String> operacaoFieldsOrdered;
     private final List<String> parcelasFieldsOrdered;
+    private final List<String> originacaoFieldsOrdered;
+    private final List<String> amortizacoesFieldsOrdered;
 
-    private SparseFieldSet(List<String> operacaoFieldsOrdered, List<String> parcelasFieldsOrdered) {
+    private SparseFieldSet(List<String> operacaoFieldsOrdered, List<String> parcelasFieldsOrdered, List<String> originacaoFieldsOrdered, List<String> amortizacoesFieldsOrdered) {
         this.operacaoFieldsOrdered = Collections.unmodifiableList(operacaoFieldsOrdered);
         this.parcelasFieldsOrdered = Collections.unmodifiableList(parcelasFieldsOrdered);
+        this.originacaoFieldsOrdered = Collections.unmodifiableList(originacaoFieldsOrdered);
+        this.amortizacoesFieldsOrdered = Collections.unmodifiableList(amortizacoesFieldsOrdered);
     }
 
     /**
@@ -51,7 +74,7 @@ public final class SparseFieldSet {
      */
     public static SparseFieldSet parse(String fieldsParam) {
         if (fieldsParam == null || fieldsParam.isBlank()) {
-            return new SparseFieldSet(List.of(), List.of());
+            return new SparseFieldSet(List.of(), List.of(), List.of(), List.of());
         }
 
         String rest = fieldsParam.trim();
@@ -64,6 +87,8 @@ public final class SparseFieldSet {
     private static SparseFieldSet parseStructured(String rest) {
         List<String> operacaoFields = new ArrayList<>();
         List<String> parcelasFields = new ArrayList<>();
+        List<String> originacaoFields = new ArrayList<>();
+        List<String> amortizacoesFields = new ArrayList<>();
         Matcher m = STRUCTURED.matcher(rest);
         while (m.find()) {
             String resource = m.group(1).trim();
@@ -73,8 +98,12 @@ public final class SparseFieldSet {
                     operacaoFields.addAll(OPERACAO_FIELDS);
                 } else if (isParcelas(resource)) {
                     parcelasFields.addAll(PARCELAS_FIELDS);
+                } else if (isOriginacao(resource)) {
+                    originacaoFields.addAll(ORIGINACAO_FIELDS);
+                } else if (isAmortizacoes(resource)) {
+                    amortizacoesFields.addAll(AMORTIZACOES_FIELDS);
                 } else {
-                    throw new InvalidFieldException("Recurso não permitido: " + resource + ". Use: operacao/operacoes, parcela/parcelas.");
+                    throw new InvalidFieldException("Recurso não permitido: " + resource + ". Use: operacao/operacoes, parcela/parcelas, originacao/originacoes, amortizacao/amortizacoes.");
                 }
             } else {
                 for (String f : inner.split(",")) {
@@ -89,24 +118,38 @@ public final class SparseFieldSet {
                             throw new InvalidFieldException("Campo não permitido: parcelas." + field);
                         }
                         parcelasFields.add(field);
+                    } else if (isOriginacao(resource)) {
+                        if (!ORIGINACAO_FIELDS.contains(field)) {
+                            throw new InvalidFieldException("Campo não permitido: originacao." + field);
+                        }
+                        originacaoFields.add(field);
+                    } else if (isAmortizacoes(resource)) {
+                        if (!AMORTIZACOES_FIELDS.contains(field)) {
+                            throw new InvalidFieldException("Campo não permitido: amortizacoes." + field);
+                        }
+                        amortizacoesFields.add(field);
                     } else {
-                        throw new InvalidFieldException("Recurso não permitido: " + resource + ". Use: operacao/operacoes, parcela/parcelas.");
+                        throw new InvalidFieldException("Recurso não permitido: " + resource + ". Use: operacao/operacoes, parcela/parcelas, originacao/originacoes, amortizacao/amortizacoes.");
                     }
                 }
             }
         }
-        if (operacaoFields.isEmpty() && parcelasFields.isEmpty()) {
-            throw new InvalidFieldException("Formato inválido. Use: operacao(campo1,campo2),parcela(campo1) ou parcelas(campo1).");
+        if (operacaoFields.isEmpty() && parcelasFields.isEmpty() && originacaoFields.isEmpty() && amortizacoesFields.isEmpty()) {
+            throw new InvalidFieldException("Formato inválido. Use: operacao(campo1,campo2),parcela(campo1),originacao(campo1),amortizacoes(campo1).");
         }
         return new SparseFieldSet(
                 new LinkedHashSet<>(operacaoFields).stream().toList(),
-                new LinkedHashSet<>(parcelasFields).stream().toList()
+                new LinkedHashSet<>(parcelasFields).stream().toList(),
+                new LinkedHashSet<>(originacaoFields).stream().toList(),
+                new LinkedHashSet<>(amortizacoesFields).stream().toList()
         );
     }
 
     private static SparseFieldSet parseDotNotation(String rest) {
         List<String> operacaoFields = new ArrayList<>();
         List<String> parcelasFields = new ArrayList<>();
+        List<String> originacaoFields = new ArrayList<>();
+        List<String> amortizacoesFields = new ArrayList<>();
         for (String path : rest.split(",")) {
             String p = path.trim();
             int dot = p.indexOf('.');
@@ -130,13 +173,33 @@ public final class SparseFieldSet {
                     }
                     parcelasFields.add(field);
                 }
+            } else if (isOriginacao(resource)) {
+                if (field == null || field.isEmpty()) {
+                    originacaoFields.addAll(ORIGINACAO_FIELDS);
+                } else {
+                    if (!ORIGINACAO_FIELDS.contains(field)) {
+                        throw new InvalidFieldException("Campo não permitido: " + p);
+                    }
+                    originacaoFields.add(field);
+                }
+            } else if (isAmortizacoes(resource)) {
+                if (field == null || field.isEmpty()) {
+                    amortizacoesFields.addAll(AMORTIZACOES_FIELDS);
+                } else {
+                    if (!AMORTIZACOES_FIELDS.contains(field)) {
+                        throw new InvalidFieldException("Campo não permitido: " + p);
+                    }
+                    amortizacoesFields.add(field);
+                }
             } else {
-                throw new InvalidFieldException("Campo não permitido: " + p + ". Use: operacao/operacoes, parcela/parcelas.");
+                throw new InvalidFieldException("Campo não permitido: " + p + ". Use: operacao/operacoes, parcela/parcelas, originacao/originacoes, amortizacao/amortizacoes.");
             }
         }
         return new SparseFieldSet(
                 new LinkedHashSet<>(operacaoFields).stream().toList(),
-                new LinkedHashSet<>(parcelasFields).stream().toList()
+                new LinkedHashSet<>(parcelasFields).stream().toList(),
+                new LinkedHashSet<>(originacaoFields).stream().toList(),
+                new LinkedHashSet<>(amortizacoesFields).stream().toList()
         );
     }
 
@@ -154,7 +217,25 @@ public final class SparseFieldSet {
         return parcelasFieldsOrdered.isEmpty() ? new ArrayList<>(PARCELAS_FIELDS) : parcelasFieldsOrdered;
     }
 
+    /** Campos da originacao (ordem estável). Se vazio e expand=originacao, usar todos. */
+    public List<String> getOriginacaoFieldsOrdered() {
+        return originacaoFieldsOrdered;
+    }
+
+    public List<String> getOriginacaoFieldsForExpand() {
+        return originacaoFieldsOrdered.isEmpty() ? new ArrayList<>(ORIGINACAO_FIELDS) : originacaoFieldsOrdered;
+    }
+
+    /** Campos de cada amortização (ordem estável). Se vazio e expand=amortizacoes, usar todos. */
+    public List<String> getAmortizacoesFieldsOrdered() {
+        return amortizacoesFieldsOrdered;
+    }
+
+    public List<String> getAmortizacoesFieldsForExpand() {
+        return amortizacoesFieldsOrdered.isEmpty() ? new ArrayList<>(AMORTIZACOES_FIELDS) : amortizacoesFieldsOrdered;
+    }
+
     public boolean hasProjection() {
-        return !operacaoFieldsOrdered.isEmpty() || !parcelasFieldsOrdered.isEmpty();
+        return !operacaoFieldsOrdered.isEmpty() || !parcelasFieldsOrdered.isEmpty() || !originacaoFieldsOrdered.isEmpty() || !amortizacoesFieldsOrdered.isEmpty();
     }
 }

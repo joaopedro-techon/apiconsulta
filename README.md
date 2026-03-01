@@ -94,8 +94,13 @@ Accept: application/json
 
 | Parâmetro | Descrição |
 |-----------|------------|
-| `expand`  | `parcelas` — inclui parcelas na resposta. **Sem expand = só operação** (menos dados, melhor performance). |
+| `expand`  | `parcelas` ou `parcela` — inclui parcelas na resposta. **Sem expand = só operação**. |
 | `fields`  | Projeção: quais campos retornar. Formato estruturado ou com pontos. |
+| `filter`  | Filtra parcelas (exige `expand=parcelas`). Vários filtros em AND. Formato: `parcelas.campo:operador:valor` |
+
+**Filter — operadores:** `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`.  
+Ex.: `filter=parcelas.statusParcela:eq:ATIVA`, `filter=parcelas.valorPrincipalParcela:gte:50`, `filter=parcelas.statusParcela:in:ATIVA,CANCELADA`, `filter=parcelas.statusParcela:neq:ATIVA`.  
+Múltiplos: `?filter=parcelas.statusParcela:eq:ATIVA&filter=parcelas.valorPrincipalParcela:gte:50` ou `?filter=parcelas.statusParcela:eq:ATIVA;parcelas.valorPrincipalParcela:gte:50`
 
 **Formato estruturado (recomendado):** `fields=operacao(numeroOperacao,status),parcelas(numeroParcela,valorPrincipalParcela)`  
 **Com pontos:** `fields=operacao.numeroOperacao,parcelas.numeroParcela`

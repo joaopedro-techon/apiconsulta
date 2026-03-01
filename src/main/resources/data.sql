@@ -18,3 +18,21 @@ INSERT INTO tb_parcela (numero_operacao, numero_parcela, status_parcela, valor_p
 (2024002, 2, 'LIQUIDADA', 2000.00, 90.00),
 (2024003, 1, 'REPACTUADA', 500.00, 25.00),
 (2024003, 2, 'ATIVA', 500.00, 20.00);
+
+INSERT INTO tb_originacao (numero_operacao, taxa_juros, canal_contratacao) VALUES
+(2024001, 1.25, 'DIGITAL'),
+(2024002, 1.50, 'LOJA'),
+(2024003, 1.10, 'DIGITAL'),
+(2024004, 1.75, 'TELEFONE'),
+(2024005, 1.30, 'DIGITAL'),
+(2024006, 1.20, 'LOJA'),
+(2024007, 1.60, 'TELEFONE');
+
+INSERT INTO tb_amortizacao (numero_operacao, numero_parcela_amortizada, data_recebimento, valor_principal_amortizado, valor_juros_principal_amortizado, indicador_validade_amortizacao) VALUES
+(2024001, 1, '2024-02-10', 500.00, 25.00, true),
+(2024001, 1, '2024-03-10', 500.00, 25.00, true),
+(2024001, 2, '2024-04-15', 1000.00, 45.00, true),
+(2024002, 1, '2024-03-20', 2000.00, 100.00, true),
+(2024002, 2, '2024-04-25', 2000.00, 90.00, true),
+(2024003, 1, '2024-04-01', 250.00, 12.50, false),
+(2024003, 2, '2024-05-10', 500.00, 20.00, true);

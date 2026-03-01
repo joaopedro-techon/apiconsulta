@@ -1,5 +1,6 @@
 package br.com.consultas.application.usecase;
 
+import br.com.consultas.application.filter.FilterOptions;
 import br.com.consultas.application.port.input.ObterOperacaoPort;
 import br.com.consultas.application.port.output.OperacaoProjectionPort;
 import br.com.consultas.application.projection.ExpandOptions;
@@ -10,8 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 /**
- * Caso de uso: obter operação com projeção e expand no banco (Criteria API).
- * Sem expand = só operação; expand=parcelas = uma query com LEFT JOIN parcelas.
+ * Caso de uso: obter operação com projeção, expand e filter no banco (Criteria API).
  */
 @Service
 public class ObterOperacaoUseCase implements ObterOperacaoPort {
@@ -24,7 +24,7 @@ public class ObterOperacaoUseCase implements ObterOperacaoPort {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<?> obterPorNumero(Long numeroOperacao, SparseFieldSet fields, ExpandOptions expand) {
-        return projectionPort.findProjection(numeroOperacao, fields, expand);
+    public Optional<?> obterPorNumero(Long numeroOperacao, SparseFieldSet fields, ExpandOptions expand, FilterOptions filters) {
+        return projectionPort.findProjection(numeroOperacao, fields, expand, filters);
     }
 }

@@ -1,6 +1,7 @@
 package br.com.consultas.infrastructure.web.controller;
 
 import br.com.consultas.application.dto.ParcelaResponse;
+import br.com.consultas.application.filter.FilterOptions;
 import br.com.consultas.application.port.input.ObterOperacaoPort;
 import br.com.consultas.application.port.input.ObterParcelasPort;
 import br.com.consultas.application.projection.ExpandOptions;
@@ -37,17 +38,19 @@ public class OperacaoController {
 
     /**
      * Retorna a operação (e opcionalmente parcelas).
-     * Sem <code>expand=parcelas</code> retorna só operação; com expand, uma query traz operação + parcelas.
+     * <code>expand=parcelas</code> inclui parcelas; <code>filter</code> filtra parcelas (ex.: parcelas.statusParcela:eq:ATIVA).
      */
     @GetMapping("/{numeroOperacao}")
     public ResponseEntity<?> obterPorNumero(
             @PathVariable Long numeroOperacao,
             @RequestParam(name = "fields", required = false) String fieldsParam,
-            @RequestParam(name = "expand", required = false) String expandParam) {
+            @RequestParam(name = "expand", required = false) String expandParam,
+            @RequestParam(name = "filter", required = false) List<String> filterParams) {
 
         SparseFieldSet fields = SparseFieldSet.parse(fieldsParam);
         ExpandOptions expand = ExpandOptions.parse(expandParam);
-        return obterOperacaoPort.obterPorNumero(numeroOperacao, fields, expand)
+        FilterOptions filters = FilterOptions.parse(filterParams);
+        return obterOperacaoPort.obterPorNumero(numeroOperacao, fields, expand, filters)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

@@ -8,6 +8,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Entidade JPA para operação (tb_operacao). Relação 1:N com tb_parcela.
+ * Entidade JPA para operação (tb_operacao). Relação 1:N com tb_parcela, 1:1 com tb_originacao, 1:N com tb_amortizacao.
  */
 @Entity
 @Table(name = "tb_operacao")
@@ -48,4 +49,10 @@ public class OperacaoEntity {
 
     @OneToMany(mappedBy = "operacao", fetch = FetchType.LAZY)
     private List<ParcelaEntity> parcelas = new ArrayList<>();
+
+    @OneToOne(mappedBy = "operacao", fetch = FetchType.LAZY)
+    private OriginacaoEntity originacao;
+
+    @OneToMany(mappedBy = "operacao", fetch = FetchType.LAZY)
+    private List<AmortizacaoEntity> amortizacoes = new ArrayList<>();
 }
