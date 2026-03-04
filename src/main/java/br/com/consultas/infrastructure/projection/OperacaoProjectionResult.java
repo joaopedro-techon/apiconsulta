@@ -1,4 +1,4 @@
-package br.com.consultas.application.projection;
+package br.com.consultas.infrastructure.projection;
 
 import java.util.List;
 import java.util.Map;

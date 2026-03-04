@@ -1,4 +1,6 @@
-package br.com.consultas.domain.model;
+package br.com.consultas.domain.models;
+
+import br.com.consultas.domain.enums.StatusOperacao;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -7,11 +9,11 @@ import java.util.List;
  * Modelo de domínio de operação (com parcelas).
  * Camada Domain - regras de negócio centrais, sem dependências de frameworks.
  */
-public record Operacao(
+public record OperacaoDomain(
         Long numeroOperacao,
         StatusOperacao status,
         LocalDate dataContratacao,
         int codigoMeioCobranca,
-        List<Parcela> parcelas
+        List<ParcelaDomain> parcelas
 ) {
 }

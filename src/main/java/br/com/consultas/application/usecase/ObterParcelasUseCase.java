@@ -1,9 +1,9 @@
 package br.com.consultas.application.usecase;
 
-import br.com.consultas.application.dto.ParcelaResponse;
+import br.com.consultas.infrastructure.web.controller.response.ParcelaResponse;
 import br.com.consultas.application.port.input.ObterParcelasPort;
-import br.com.consultas.domain.model.Parcela;
-import br.com.consultas.domain.port.ParcelaRepositoryPort;
+import br.com.consultas.application.port.output.ParcelaRepositoryPort;
+import br.com.consultas.domain.models.ParcelaDomain;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +29,7 @@ public class ObterParcelasUseCase implements ObterParcelasPort {
                 .toList();
     }
 
-    private ParcelaResponse toResponse(Parcela parcela) {
+    private ParcelaResponse toResponse(ParcelaDomain parcela) {
         return new ParcelaResponse(
                 parcela.numeroOperacao(),
                 parcela.numeroParcela(),

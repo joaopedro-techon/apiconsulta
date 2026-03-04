@@ -1,7 +1,7 @@
 package br.com.consultas.infrastructure.persistence.adapter;
 
-import br.com.consultas.domain.model.Parcela;
-import br.com.consultas.domain.port.ParcelaRepositoryPort;
+import br.com.consultas.application.port.output.ParcelaRepositoryPort;
+import br.com.consultas.domain.models.ParcelaDomain;
 import br.com.consultas.infrastructure.persistence.entity.ParcelaEntity;
 import br.com.consultas.infrastructure.persistence.repository.ParcelaJpaRepository;
 import org.springframework.stereotype.Component;
@@ -21,14 +21,14 @@ public class ParcelaRepositoryAdapter implements ParcelaRepositoryPort {
     }
 
     @Override
-    public List<Parcela> findByNumeroOperacao(Long numeroOperacao) {
+    public List<ParcelaDomain> findByNumeroOperacao(Long numeroOperacao) {
         return jpaRepository.findByNumeroOperacaoOrderByNumeroParcela(numeroOperacao).stream()
                 .map(this::toDomain)
                 .toList();
     }
 
-    private Parcela toDomain(ParcelaEntity entity) {
-        return new Parcela(
+    private ParcelaDomain toDomain(ParcelaEntity entity) {
+        return new ParcelaDomain(
                 entity.getNumeroOperacao(),
                 entity.getNumeroParcela(),
                 entity.getStatusParcela(),

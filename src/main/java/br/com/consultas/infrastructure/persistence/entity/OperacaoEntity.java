@@ -1,7 +1,6 @@
 package br.com.consultas.infrastructure.persistence.entity;
 
-import br.com.consultas.domain.model.StatusOperacao;
-import jakarta.persistence.CascadeType;
+import br.com.consultas.domain.enums.StatusOperacao;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

@@ -3,8 +3,8 @@ package br.com.consultas.application.usecase;
 import br.com.consultas.application.filter.FilterOptions;
 import br.com.consultas.application.port.input.ObterOperacaoPort;
 import br.com.consultas.application.port.output.OperacaoProjectionPort;
-import br.com.consultas.application.projection.ExpandOptions;
-import br.com.consultas.application.projection.SparseFieldSet;
+import br.com.consultas.infrastructure.projection.ExpandOptions;
+import br.com.consultas.infrastructure.projection.SparseFieldSet;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

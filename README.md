@@ -1,6 +1,8 @@
 # Consultas Operações de Crédito
 
-API REST em Spring Boot (Java 21) para consulta de operações de crédito em base **Amazon Aurora PostgreSQL**. Organizada com **Clean Architecture**.
+API REST em Spring Boot (Java 21) para consulta de operações de crédito em base **Amazon Aurora PostgreSQL**. Organizada com **Clean Architecture** (camadas concêntricas e Regra de Dependência).
+
+📐 **Detalhes da arquitetura:** [ARCHITECTURE.md](ARCHITECTURE.md)
 
 ## Requisitos
 
@@ -12,19 +14,22 @@ API REST em Spring Boot (Java 21) para consulta de operações de crédito em ba
 
 ```
 br.com.consultas/
-├── domain/                    # Camada mais interna - regras de negócio
-│   ├── model/                 # Entidades de domínio
-│   └── port/                  # Contratos (interfaces) de saída
-├── application/               # Casos de uso
-│   ├── dto/                   # Objetos de transferência
-│   ├── port/input/            # Contratos de entrada (use cases)
+├── domain/                    # Entities – regras de negócio da empresa (não depende de nada)
+│   └── model/                 # Entidades de domínio (Operacao, Parcela, enums)
+├── application/               # Use Cases – regras de aplicação
+│   ├── dto/                   # Objetos de transferência (resposta da API)
+│   ├── filter/                # Filtros (filter=parcelas.campo:op:valor)
+│   ├── projection/            # Projeção (fields, expand, resultado)
+│   ├── port/
+│   │   ├── input/             # Contratos de entrada (use cases)
+│   │   └── output/            # Contratos de saída (repositórios, projeção) – Gateways
 │   └── usecase/               # Implementações dos casos de uso
-└── infrastructure/            # Adaptadores externos
-    ├── persistence/           # JPA, repositórios, banco de dados
-    └── web/                   # Controllers REST
+└── infrastructure/            # Interface Adapters + Frameworks & Drivers
+    ├── persistence/           # Gateways (adapters), JPA entities, repositórios, projeção
+    └── web/                  # Controllers REST, tratamento de erros HTTP
 ```
 
-**Fluxo de dependência:** `infrastructure` → `application` → `domain` (o domínio não depende de nada).
+**Regra de dependência:** dependências só apontam para dentro. `domain` não importa `application` nem `infrastructure`; `application` pode depender de `domain`; `infrastructure` implementa os ports e usa frameworks (Spring, JPA).
 
 ## Tabelas (padrão tb_*)
 

@@ -1,4 +1,4 @@
-package br.com.consultas.application.projection;
+package br.com.consultas.infrastructure.exceptions;
 
 /**
  * Lançada quando os parâmetros <code>fields</code> ou <code>expand</code> são inválidos.

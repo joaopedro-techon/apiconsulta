@@ -1,4 +1,6 @@
-package br.com.consultas.application.projection;
+package br.com.consultas.infrastructure.projection;
+
+import br.com.consultas.infrastructure.exceptions.InvalidFieldException;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,6 +1,6 @@
 package br.com.consultas.application.port.input;
 
-import br.com.consultas.application.dto.ParcelaResponse;
+import br.com.consultas.infrastructure.web.controller.response.ParcelaResponse;
 
 import java.util.List;
 

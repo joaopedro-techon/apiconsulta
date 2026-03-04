@@ -1,7 +1,7 @@
 package br.com.consultas.application.filter;
 
-import br.com.consultas.application.projection.InvalidFieldException;
-import br.com.consultas.application.projection.SparseFieldSet;
+import br.com.consultas.infrastructure.exceptions.InvalidFieldException;
+import br.com.consultas.infrastructure.projection.SparseFieldSet;
 
 import java.util.ArrayList;
 import java.util.Arrays;

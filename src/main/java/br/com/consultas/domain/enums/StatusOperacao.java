@@ -1,4 +1,4 @@
-package br.com.consultas.domain.model;
+package br.com.consultas.domain.enums;
 
 /**
  * Status da operação de crédito.

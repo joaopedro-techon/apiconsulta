@@ -1,11 +1,11 @@
 package br.com.consultas.infrastructure.web.controller;
 
-import br.com.consultas.application.dto.ParcelaResponse;
+import br.com.consultas.infrastructure.web.controller.response.ParcelaResponse;
 import br.com.consultas.application.filter.FilterOptions;
 import br.com.consultas.application.port.input.ObterOperacaoPort;
 import br.com.consultas.application.port.input.ObterParcelasPort;
-import br.com.consultas.application.projection.ExpandOptions;
-import br.com.consultas.application.projection.SparseFieldSet;
+import br.com.consultas.infrastructure.projection.ExpandOptions;
+import br.com.consultas.infrastructure.projection.SparseFieldSet;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

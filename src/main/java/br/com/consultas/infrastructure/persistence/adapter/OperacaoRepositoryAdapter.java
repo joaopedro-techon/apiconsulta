@@ -1,8 +1,8 @@
 package br.com.consultas.infrastructure.persistence.adapter;
 
-import br.com.consultas.domain.model.Operacao;
-import br.com.consultas.domain.model.Parcela;
-import br.com.consultas.domain.port.OperacaoRepositoryPort;
+import br.com.consultas.application.port.output.OperacaoRepositoryPort;
+import br.com.consultas.domain.models.OperacaoDomain;
+import br.com.consultas.domain.models.ParcelaDomain;
 import br.com.consultas.infrastructure.persistence.entity.OperacaoEntity;
 import br.com.consultas.infrastructure.persistence.entity.ParcelaEntity;
 import br.com.consultas.infrastructure.persistence.repository.OperacaoJpaRepository;
@@ -26,17 +26,17 @@ public class OperacaoRepositoryAdapter implements OperacaoRepositoryPort {
     }
 
     @Override
-    public Optional<Operacao> findByNumeroOperacao(Long numeroOperacao) {
+    public Optional<OperacaoDomain> findByNumeroOperacao(Long numeroOperacao) {
         return jpaRepository.findByNumeroOperacaoWithParcelas(numeroOperacao)
                 .map(this::toDomain);
     }
 
-    private Operacao toDomain(OperacaoEntity entity) {
-        List<Parcela> parcelas = entity.getParcelas().stream()
+    private OperacaoDomain toDomain(OperacaoEntity entity) {
+        List<ParcelaDomain> parcelas = entity.getParcelas().stream()
                 .sorted(Comparator.comparing(ParcelaEntity::getNumeroParcela))
                 .map(this::toParcelaDomain)
                 .toList();
-        return new Operacao(
+        return new OperacaoDomain(
                 entity.getNumeroOperacao(),
                 entity.getStatus(),
                 entity.getDataContratacao(),
@@ -45,8 +45,8 @@ public class OperacaoRepositoryAdapter implements OperacaoRepositoryPort {
         );
     }
 
-    private Parcela toParcelaDomain(ParcelaEntity entity) {
-        return new Parcela(
+    private ParcelaDomain toParcelaDomain(ParcelaEntity entity) {
+        return new ParcelaDomain(
                 entity.getNumeroOperacao(),
                 entity.getNumeroParcela(),
                 entity.getStatusParcela(),

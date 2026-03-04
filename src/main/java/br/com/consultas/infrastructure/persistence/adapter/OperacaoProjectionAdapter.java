@@ -2,9 +2,9 @@ package br.com.consultas.infrastructure.persistence.adapter;
 
 import br.com.consultas.application.filter.FilterOptions;
 import br.com.consultas.application.port.output.OperacaoProjectionPort;
-import br.com.consultas.application.projection.ExpandOptions;
-import br.com.consultas.application.projection.OperacaoProjectionResult;
-import br.com.consultas.application.projection.SparseFieldSet;
+import br.com.consultas.infrastructure.projection.ExpandOptions;
+import br.com.consultas.infrastructure.projection.OperacaoProjectionResult;
+import br.com.consultas.infrastructure.projection.SparseFieldSet;
 import br.com.consultas.infrastructure.persistence.projection.OperacaoProjectionQueryBuilder;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Component;

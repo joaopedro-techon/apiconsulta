@@ -1,8 +1,8 @@
 package br.com.consultas.application.port.input;
 
 import br.com.consultas.application.filter.FilterOptions;
-import br.com.consultas.application.projection.ExpandOptions;
-import br.com.consultas.application.projection.SparseFieldSet;
+import br.com.consultas.infrastructure.projection.ExpandOptions;
+import br.com.consultas.infrastructure.projection.SparseFieldSet;
 
 import java.util.Optional;
 

@@ -1,4 +1,4 @@
-package br.com.consultas.application.dto;
+package br.com.consultas.infrastructure.web.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

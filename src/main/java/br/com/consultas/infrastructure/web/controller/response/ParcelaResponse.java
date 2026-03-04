@@ -1,6 +1,6 @@
-package br.com.consultas.application.dto;
+package br.com.consultas.infrastructure.web.controller.response;
 
-import br.com.consultas.domain.model.StatusParcela;
+import br.com.consultas.domain.enums.StatusParcela;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
