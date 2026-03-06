@@ -19,6 +19,7 @@ br.com.consultas/
 ├── application/               # Use Cases – regras de aplicação
 │   ├── dto/                   # Objetos de transferência (resposta da API)
 │   ├── filter/                # Filtros (filter=parcelas.campo:op:valor)
+│   ├── pagination/            # Keyset (cursor) – request, page, codec
 │   ├── projection/            # Projeção (fields, expand, resultado)
 │   ├── port/
 │   │   ├── input/             # Contratos de entrada (use cases)
@@ -85,6 +86,46 @@ Configure via variáveis de ambiente:
 Crie a tabela no Aurora executando `src/main/resources/schema.sql`.
 
 ## API REST
+
+### GET Listar operações (paginação keyset/cursor)
+
+Listagem performática com **keyset pagination** (cursor opaco): custo O(1) por página, sem OFFSET.
+
+```
+GET /api/operacoes-credito?limit=20&cursor=opaqueToken
+Accept: application/json
+```
+
+| Parâmetro | Descrição |
+|-----------|-----------|
+| `limit`   | Tamanho da página (1 a 100). Padrão: 20. |
+| `cursor`  | Cursor opaco da próxima página. Use o valor de `pagination.nextCursor` da resposta anterior. Omitir = primeira página. |
+
+**Resposta 200 OK:**
+```json
+{
+  "data": [
+    {
+      "numeroOperacao": 2024001,
+      "status": "ATIVA",
+      "dataContratacao": "2024-01-15",
+      "codigoMeioCobranca": 1
+    }
+  ],
+  "pagination": {
+    "nextCursor": "eyJu...",
+    "hasMore": true,
+    "limit": 20
+  }
+}
+```
+
+Quando houver próxima página, o cabeçalho **Link** (RFC 5988) é enviado:
+```
+Link: </api/operacoes-credito?limit=20&cursor=eyJu...>; rel="next"
+```
+
+Próxima página: use o mesmo `GET` com `cursor=pagination.nextCursor` da resposta (ou siga o `Link`).
 
 ### GET Operação por número
 
