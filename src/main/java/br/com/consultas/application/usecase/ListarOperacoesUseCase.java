@@ -5,6 +5,9 @@ import br.com.consultas.application.pagination.KeysetPage;
 import br.com.consultas.application.pagination.KeysetPaginationRequest;
 import br.com.consultas.application.port.input.ListarOperacoesPort;
 import br.com.consultas.application.port.output.OperacaoKeysetPort;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,9 @@ public class ListarOperacoesUseCase implements ListarOperacoesPort {
 
     @Override
     @Transactional(readOnly = true)
+    @RateLimiter(name = "operacoes-db")
+    @Bulkhead(name = "operacoes-db")
+    @CircuitBreaker(name = "operacoes-db")
     public KeysetPage<Map<String, Object>> listar(KeysetPaginationRequest request) {
         Long afterKey = KeysetCursorCodec.decode(request.cursor());
         OperacaoKeysetPort.KeysetPageResult result = keysetPort.findPageAfter(afterKey, request.limit());

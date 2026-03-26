@@ -5,6 +5,9 @@ import br.com.consultas.application.port.input.ObterOperacaoPort;
 import br.com.consultas.application.port.output.OperacaoProjectionPort;
 import br.com.consultas.infrastructure.projection.ExpandOptions;
 import br.com.consultas.infrastructure.projection.SparseFieldSet;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +27,9 @@ public class ObterOperacaoUseCase implements ObterOperacaoPort {
 
     @Override
     @Transactional(readOnly = true)
+    @RateLimiter(name = "operacoes-db")
+    @Bulkhead(name = "operacoes-db")
+    @CircuitBreaker(name = "operacoes-db")
     public Optional<?> obterPorNumero(Long numeroOperacao, SparseFieldSet fields, ExpandOptions expand, FilterOptions filters) {
         return projectionPort.findProjection(numeroOperacao, fields, expand, filters);
     }

@@ -32,6 +32,66 @@ br.com.consultas/
 
 **Regra de dependência:** dependências só apontam para dentro. `domain` não importa `application` nem `infrastructure`; `application` pode depender de `domain`; `infrastructure` implementa os ports e usa frameworks (Spring, JPA).
 
+## Resiliência (Circuit Breaker, Rate Limiter, Bulkhead)
+
+A API usa **Resilience4j** em torno do acesso ao banco (instância `operacoes-db`), aplicado nos use cases de consulta:
+
+| Mecanismo | Função | Resposta quando ativado |
+|-----------|--------|--------------------------|
+| **Rate Limiter** | Limita requisições por segundo (ex.: 3000/s) | **429 Too Many Requests** |
+| **Bulkhead** | Limita chamadas concorrentes (ex.: 20) para não esgotar pool/threads | **429 Too Many Requests** |
+| **Circuit Breaker** | Após muitas falhas, interrompe chamadas ao banco por um tempo | **503 Service Unavailable** |
+
+Configuração em `application.properties` (prefixos `resilience4j.ratelimiter`, `resilience4j.bulkhead`, `resilience4j.circuitbreaker`). Ajuste conforme carga esperada (ex.: ~5000 req/s):
+
+- **Rate Limiter:** `limit-for-period` + `limit-refresh-period` (ex.: 3000 em 1s). `timeout-duration=0` = rejeitar na hora ao exceder.
+- **Bulkhead:** `max-concurrent-calls` na ordem do connection pool (ex.: 20 com pool 10). `max-wait-duration=0` = não esperar vaga.
+- **Circuit Breaker:** janela, taxa de falha e tempo em aberto conforme documentação no próprio arquivo.
+
+## HTTP Outbound performático (Síncrono + Virtual Threads) para fanout
+
+Para fazer chamada a serviços externos em paralelo (ex.: fanout com 8 serviços), o projeto adicionou um **HTTP client** performático com:
+
+- **Pool de conexões** e **timeouts fail-fast** via `Apache HttpClient 5` em `external.http.*`.
+- **Resiliência por chamada externa** via Resilience4j (instância `external-http`) em torno do adapter `ApacheHttpClientAdapter` (HTTP síncrono com Apache HttpClient 5).
+- **Executor dedicado** para coordenar fanout (bean `fanoutExecutor`) utilizando **Virtual Threads**.
+
+### Configuração (application.properties)
+
+Valores principais (ajuste conforme SLA/latência média e volume):
+
+- `external.http.max-connections`
+- `external.http.connect-timeout-ms`
+- `external.http.response-timeout-ms`
+- `fanout.executor.core-pool-size` / `fanout.executor.max-pool-size` / `fanout.executor.queue-capacity`
+
+E Resilience4j para chamadas externas:
+
+- `resilience4j.circuitbreaker.instances.external-http.*`
+- `resilience4j.ratelimiter.instances.external-http.*`
+- `resilience4j.bulkhead.instances.external-http.*`
+
+### Como usar no fanout (modelo recomendado)
+
+No use case (application), injete `HttpClientPort` e o executor `fanoutExecutor`, e dispare as 8 chamadas em paralelo com semântica fail-fast.
+
+Padrão:
+
+```java
+// Exemplo (pseudo):
+// CompletableFuture<R1> f1 = CompletableFuture.supplyAsync(() -> httpClient.get(url1, Tipo1.class), fanoutExecutor);
+// ... até f8
+// CompletableFuture.allOf(f1, ..., f8).join();
+// Combine os resultados.
+```
+
+Se quiser fail-fast de forma simples, use:
+
+```java
+// tasks: lista de Callable<T> (cada uma faz uma chamada via httpClient.get)
+// resultado = VirtualThreadFanout.failFast(tasks, fanoutExecutor, Duration.ofMillis(800));
+```
+
 ## Tabelas (padrão tb_*)
 
 | Tabela         | Descrição                    | Relação      |
