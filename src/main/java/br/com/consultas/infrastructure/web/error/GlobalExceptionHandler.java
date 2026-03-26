@@ -11,8 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.reactive.function.client.WebClientRequestException;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.concurrent.TimeoutException;
 
@@ -118,34 +116,6 @@ public class GlobalExceptionHandler {
                 request.getRequestURI()
         );
         return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).body(body);
-    }
-
-    /**
-     * Falha de conexão ao serviço externo.
-     */
-    @ExceptionHandler(WebClientRequestException.class)
-    public ResponseEntity<ApiError> handleWebClientRequest(WebClientRequestException ex, HttpServletRequest request) {
-        ApiError body = ApiError.of(
-                HttpStatus.BAD_GATEWAY.value(),
-                "Falha na comunicação",
-                "Não foi possível se comunicar com um serviço externo.",
-                request.getRequestURI()
-        );
-        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(body);
-    }
-
-    /**
-     * Serviço externo respondeu com erro HTTP (ex.: 4xx/5xx).
-     */
-    @ExceptionHandler(WebClientResponseException.class)
-    public ResponseEntity<ApiError> handleWebClientResponse(WebClientResponseException ex, HttpServletRequest request) {
-        ApiError body = ApiError.of(
-                HttpStatus.BAD_GATEWAY.value(),
-                "Serviço externo retornou erro",
-                "O serviço externo respondeu com status " + ex.getRawStatusCode() + ".",
-                request.getRequestURI()
-        );
-        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(body);
     }
 
     @ExceptionHandler(Exception.class)

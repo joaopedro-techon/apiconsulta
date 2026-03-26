@@ -71,6 +71,21 @@ E Resilience4j para chamadas externas:
 - `resilience4j.ratelimiter.instances.external-http.*`
 - `resilience4j.bulkhead.instances.external-http.*`
 
+### Feign (exemplo de chamadas externas GET)
+
+O projeto também adicionou **Spring Cloud OpenFeign** (com **OkHttp**) para chamadas externas tipadas.
+
+- `ExternalSample1FeignClient` e `ExternalSample2FeignClient` (2 exemplos GET)
+- `ExternalSamplesFeignAdapter` implementa `ExternalSamplesPort` e traduz erros para `ExternalServiceException`
+- Essas chamadas também passam por `external-http` (circuit breaker/rate limiter/bulkhead)
+
+Configuração:
+
+- `external.sample1.base-url` (default: `https://postman-echo.com`)
+- `external.sample2.base-url` (default: `https://postman-echo.com`)
+- `spring.cloud.openfeign.okhttp.enabled=true`
+- `spring.cloud.openfeign.client.config.default.connectTimeout` e `readTimeout`
+
 ### Como usar no fanout (modelo recomendado)
 
 No use case (application), injete `HttpClientPort` e o executor `fanoutExecutor`, e dispare as 8 chamadas em paralelo com semântica fail-fast.
