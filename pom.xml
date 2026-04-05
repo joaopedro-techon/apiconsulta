@@ -24,6 +24,14 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- resilience4j-bom antes de spring-cloud-dependencies: o BOM do Spring Cloud fixa Resilience4j em 2.2.0; se ele prevalecer junto de spring-boot3 2.3.x, ocorre NoClassDefFoundError (RxJava3FallbackDecorator). -->
+            <dependency>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-bom</artifactId>
+                <version>${resilience4j.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
@@ -86,24 +94,20 @@
         <dependency>
             <groupId>io.github.resilience4j</groupId>
             <artifactId>resilience4j-spring-boot3</artifactId>
-            <version>${resilience4j.version}</version>
         </dependency>
         <!-- Resilience4j metrics for Prometheus/Micrometer (optional, recommended) -->
         <dependency>
             <groupId>io.github.resilience4j</groupId>
             <artifactId>resilience4j-micrometer</artifactId>
-            <version>${resilience4j.version}</version>
         </dependency>
         <!-- Explicit modules so RequestNotPermitted (rate limiter) and BulkheadFullException resolve in IDE -->
         <dependency>
             <groupId>io.github.resilience4j</groupId>
             <artifactId>resilience4j-ratelimiter</artifactId>
-            <version>${resilience4j.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.resilience4j</groupId>
             <artifactId>resilience4j-bulkhead</artifactId>
-            <version>${resilience4j.version}</version>
         </dependency>
 
         <dependency>

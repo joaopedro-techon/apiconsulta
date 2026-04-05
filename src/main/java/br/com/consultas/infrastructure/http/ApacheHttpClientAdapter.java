@@ -5,9 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
-import org.apache.hc.client5.http.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.springframework.stereotype.Component;
 
@@ -61,7 +62,7 @@ public class ApacheHttpClientAdapter implements HttpClientPort {
                 return null;
             }
             return objectMapper.readValue(body, responseType);
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             throw new ExternalServiceException("I/O error calling external service: " + e.getMessage(), null, null);
         }
     }
